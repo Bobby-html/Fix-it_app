@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix-it Web Portal</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --panel-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary-blue: #007bff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* Split Screen Layout */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+        }
+
+        .app-logo { font-size: 48px; font-weight: 800; margin-bottom: 20px; }
+        .app-logo span { color: #00e5ff; }
+
+        .auth-container {
+            background: var(--panel-bg);
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: #f8fafc;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .primary-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden { display: none !important; }
+
+        .flash-messages {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <div class="app-logo">Fix-<span>it</span></div>
+        <h2 style="font-weight: 300;">Your Reliable Home Services Platform</h2>
+        <p style="color: #94a3b8; max-width: 400px;">Connect with trusted local professionals for urgent repairs, or join our workforce to find gigs near you.</p>
+    </div>
+
+    <div class="right-panel">
+        <div class="auth-container">
+            
+            <h2 id="formTitle" style="margin-top: 0;">Welcome Back</h2>
+            <p id="formSubtitle" style="color: var(--text-muted); margin-bottom: 25px; font-size: 14px;">Enter your details to access your dashboard.</p>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="flash-messages">
+                {% for message in messages %}
+                  <div>{{ message }}</div>
+                {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <div class="auth-tabs">
+                <div class="tab active" id="tabCustomer" onclick="toggleRole('customer')">Customer</div>
+                <div class="tab" id="tabWorker" onclick="toggleRole('worker')">Service Provider</div>
+            </div>
+
+            <form id="loginForm" action="/login" method="POST">
+                <input type="text" name="phone" placeholder="Phone Number" class="input-field" required>
+                <input type="password" name="password" placeholder="Password" class="input-field" required>
+                
+                <button type="submit" class="primary-btn">Log In</button>
+            </form>
+
+            <form id="signupForm" action="/register" method="POST" enctype="multipart/form-data" class="hidden">
+                <input type="hidden" name="role" id="roleInput" value="Customer">
+
+                <input type="text" name="name" placeholder="Full Name" class="input-field" required>
+                <input type="text" name="phone" placeholder="Phone Number" class="input-field" required>
+                <input type="password" name="password" placeholder="Create Password" class="input-field" required>
+                
+                <div id="workerSignupFields" class="hidden" style="margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 8px;">
+                    <label style="font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: block;">Upload CNIC Image (Required)</label>
+                    <input type="file" name="cnic_image" class="input-field" accept="image/*" style="padding: 8px; margin-bottom: 0;">
+                </div>
+                
+                <button type="submit" class="primary-btn" style="background-color: #10b981;">Create Account</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 20px; font-size: 14px;">
+                <span id="toggleText">Don't have an account?</span> 
+                <a href="#" id="toggleLink" style="color: var(--primary-blue); text-decoration: none; font-weight: bold;" onclick="toggleAuthMode()">Sign up</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentRole = 'customer';
+        let currentMode = 'login';
+
+        function toggleRole(role) {
+            currentRole = role;
+            
+            // 1. Update the hidden input for the Python backend
+            document.getElementById('roleInput').value = role === 'customer' ? 'Customer' : 'Worker';
+            
+            // 2. Update UI Tabs
+            document.getElementById('tabCustomer').classList.remove('active');
+            document.getElementById('tabWorker').classList.remove('active');
+            
+            if(role === 'customer') {
+                document.getElementById('tabCustomer').classList.add('active');
+                document.getElementById('workerSignupFields').classList.add('hidden');
+            } else {
+                document.getElementById('tabWorker').classList.add('active');
+                if(currentMode === 'signup') {
+                    // Only show file upload if they are actually on the Sign Up form
+                    document.getElementById('workerSignupFields').classList.remove('hidden');
+                }
+            }
+        }
+
+        function toggleAuthMode() {
+            if(currentMode === 'login') {
+                // Switch to Sign Up
+                currentMode = 'signup';
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('signupForm').classList.remove('hidden');
+                
+                document.getElementById('formTitle').innerText = "Create an Account";
+                document.getElementById('formSubtitle').innerText = "Join Fix-it to manage your home services.";
+                document.getElementById('toggleText').innerText = "Already have an account?";
+                document.getElementById('toggleLink').innerText = "Log in";
+                
+                // Show worker fields if worker tab is already selected
+                if(currentRole === 'worker') {
+                    document.getElementById('workerSignupFields').classList.remove('hidden');
+                }
+            } else {
+                // Switch to Login
+                currentMode = 'login';
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                
+                document.getElementById('formTitle').innerText = "Welcome Back";
+                document.getElementById('formSubtitle').innerText = "Enter your details to access your dashboard.";
+                document.getElementById('toggleText').innerText = "Don't have an account?";
+                document.getElementById('toggleLink').innerText = "Sign up";
+            }
+        }
+    </script>
+</body>
+</html>

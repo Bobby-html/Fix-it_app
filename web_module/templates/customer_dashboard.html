@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix-it - Customer Dashboard</title>
+    <style>
+        :root {
+            --bg-body: #0f172a; 
+            --bg-surface: #1e293b; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --border-color: #334155; 
+            --primary-blue: #00e5ff; 
+            --success-green: #10b981; 
+            --warning-orange: #fbbf24; 
+        }
+        
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        .sidebar { 
+            width: 280px; 
+            background-color: var(--bg-surface); 
+            border-right: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 25px 20px; 
+            box-sizing: border-box; 
+            z-index: 10; 
+        }
+        
+        .brand { font-size: 28px; font-weight: 900; margin-bottom: 40px; color: var(--text-main); }
+        .brand span { color: var(--primary-blue); }
+        
+        .customer-profile { background-color: var(--bg-body); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 30px; border: 1px solid var(--border-color); }
+        .avatar { width: 70px; height: 70px; background-color: #334155; border-radius: 50%; margin: 0 auto 10px auto; display: flex; justify-content: center; align-items: center; font-size: 35px; }
+        .customer-name { font-size: 16px; font-weight: bold; color: var(--text-main); }
+        
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+        .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; font-weight: 600; color: var(--text-muted); text-decoration: none; }
+        .nav-item.active { background-color: rgba(0, 229, 255, 0.1); color: var(--primary-blue); border-left: 3px solid var(--primary-blue); }
+        
+        .post-gig-btn { background-color: var(--primary-blue); color: #0f172a; border: none; border-radius: 15px; padding: 15px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+        
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; padding: 30px 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 24px; font-weight: bold; margin: 0; }
+        
+        .gig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .gig-card { background-color: var(--bg-surface); border-radius: 25px; padding: 25px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .gig-title { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; }
+        .timestamp { font-size: 12px; color: var(--text-muted); }
+        
+        .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-open { background-color: rgba(0, 229, 255, 0.1); color: var(--primary-blue); border: 1px solid var(--primary-blue); }
+        .status-locked { background-color: rgba(251, 191, 36, 0.1); color: var(--warning-orange); border: 1px solid var(--warning-orange); }
+        
+        .ai-brief { font-size: 13px; color: #cbd5e0; margin-bottom: 20px; flex-grow: 1; }
+        .card-actions { border-top: 1px solid var(--border-color); padding-top: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .action-button { background-color: transparent; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 15px; padding: 8px 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .action-button.primary { background-color: rgba(0, 229, 255, 0.1); color: var(--primary-blue); border-color: var(--primary-blue); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">Fix-<span>it</span></div>
+        
+        <div class="customer-profile">
+            <div class="avatar">👤</div>
+            <div class="customer-name">{{ user_name }}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">📍 Logged In</div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active">📋 My Posted Gigs</li>
+            <li class="nav-item">💬 Messages</li>
+            <li class="nav-item">💳 Payment History</li>
+        </ul>
+
+        <button class="post-gig-btn">✨ Post a New Gig</button>
+        <a href="{{ url_for('web.logout') }}" class="nav-item" style="color: #ef4444; text-align: center;">🚪 Log Out</a>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">My Dashboard</h1>
+        </div>
+
+        <div class="gig-grid">
+            <div class="gig-card" style="border-color: rgba(0, 229, 255, 0.3);">
+                <div class="card-header">
+                    <div>
+                        <h3 class="gig-title">Running Faucet</h3>
+                        <div class="timestamp">Posted 30 mins ago</div>
+                    </div>
+                    <span class="status-badge status-open">Bidding Open</span>
+                </div>
+                <div class="ai-brief">Master bathroom sink is leaking continuously. Cartridge replacement likely needed.</div>
+                <div class="card-actions">
+                    <div style="font-size: 13px; font-weight: bold; color: var(--primary-blue);">5 Active Bids</div>
+                    <button class="action-button primary">Compare Offers</button>
+                </div>
+            </div>
+
+            <div class="gig-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="gig-title">Broken Ceiling Fan</h3>
+                        <div class="timestamp">Posted 2 hours ago</div>
+                    </div>
+                    <span class="status-badge status-locked">In Progress</span>
+                </div>
+                <div style="background-color: var(--bg-body); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
+                    <div style="font-size: 13px; font-weight: bold;">👨🏽‍🔧 Ali Raza <span style="color: var(--success-green);">✔</span></div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Arriving in 15 mins</div>
+                </div>
+                <div class="card-actions">
+                    <div style="font-size: 13px; font-weight: bold;">Agreed: Rs. 1,500</div>
+                    <button class="action-button">Open Chat</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

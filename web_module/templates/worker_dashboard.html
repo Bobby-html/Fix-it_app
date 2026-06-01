@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix-it - Worker Dashboard (Dark Mode)</title>
+    <style>
+        :root {
+            --bg-body: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --border-color: #334155; --primary-blue: #00e5ff; --glow-effect: 0 0 15px rgba(0, 229, 255, 0.4);
+            --success-green: #10b981; --card-hover-bg: #27354f;
+        }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 280px; background-color: var(--bg-surface); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 25px 20px; box-sizing: border-box; box-shadow: 2px 0 15px rgba(0,0,0,0.3); z-index: 10; }
+        .brand { font-size: 28px; font-weight: 900; margin-bottom: 40px; letter-spacing: -0.5px; color: var(--text-main); }
+        .brand span { color: var(--primary-blue); }
+        .worker-profile { background-color: var(--bg-body); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 30px; border: 1px solid var(--border-color); }
+        .avatar { width: 70px; height: 70px; background-color: #334155; border-radius: 50%; margin: 0 auto 10px auto; display: flex; justify-content: center; align-items: center; font-size: 35px; border: 3px solid var(--primary-blue); box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
+        .worker-name { font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .verified-badge { color: var(--success-green); font-size: 14px; }
+        .worker-rating { font-size: 13px; color: #fbbf24; font-weight: bold; margin-top: 5px; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+        .nav-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; font-weight: 600; color: var(--text-muted); transition: all 0.2s; text-decoration: none; display: block; }
+        .nav-item:hover { background-color: var(--bg-body); color: var(--primary-blue); }
+        .nav-item.active { background-color: rgba(0, 229, 255, 0.1); color: var(--primary-blue); border-left: 3px solid var(--primary-blue); border-radius: 0 10px 10px 0; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; padding: 30px 40px; overflow-y: auto; background-image: radial-gradient(circle at top right, #1e293b, #0f172a); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 24px; font-weight: bold; margin: 0; }
+        .location-filter { background-color: var(--bg-surface); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 14px; font-weight: bold; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .gig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .gig-card { background-color: var(--bg-surface); border-radius: 25px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: 1px solid var(--border-color); display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; }
+        .gig-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--primary-blue); background-color: var(--card-hover-bg); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .gig-title { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; }
+        .distance { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        .category-badge { background-color: var(--bg-body); color: var(--primary-blue); padding: 5px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; border: 1px solid var(--primary-blue); }
+        .ai-brief { background-color: var(--bg-body); padding: 15px; border-radius: 12px; font-size: 13px; color: #cbd5e0; border-left: 4px solid var(--primary-blue); margin-bottom: 20px; flex-grow: 1; }
+        .ai-brief strong { color: var(--text-main); display: block; margin-bottom: 8px; font-size: 14px; }
+        .bidding-info { font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 15px; text-align: center; }
+        .glow-button { width: 100%; padding: 15px; background-color: var(--primary-blue); color: #0f172a; border: none; border-radius: 25px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: var(--glow-effect); transition: transform 0.2s, box-shadow 0.2s; }
+        .glow-button:hover { box-shadow: 0 0 25px rgba(0, 229, 255, 0.6); transform: scale(1.02); }
+        .main-content::-webkit-scrollbar { width: 8px; }
+        .main-content::-webkit-scrollbar-track { background: var(--bg-body); }
+        .main-content::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
+        .unverified-banner { background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; color: #f59e0b; padding: 15px; border-radius: 12px; margin-bottom: 25px; font-weight: bold; font-size: 14px;}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">Fix-<span>it</span></div>
+        
+        <div class="worker-profile">
+            <div class="avatar">👨🏽‍🔧</div>
+            <div class="worker-name">
+                {{ user_name }}
+                {% if is_verified %}
+                    <span class="verified-badge" title="Verified Professional">✔</span>
+                {% endif %}
+            </div>
+            <div class="worker-rating">New Service Provider</div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active">📍 Find Local Gigs</li>
+            <li class="nav-item">💬 My Active Bids</li>
+            <li class="nav-item">✅ Completed Jobs</li>
+            <li class="nav-item">💳 Earnings</li>
+            <li class="nav-item" style="margin-top: auto; margin-bottom: 10px;">⚙️ Settings</li>
+            <a href="/logout" class="nav-item" style="color: #ef4444;">🚪 Log Out</a>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Available Nearby</h1>
+            <div class="location-filter">
+                📍 Searching your local area...
+            </div>
+        </div>
+
+        {% if not is_verified %}
+            <div class="unverified-banner">
+                ⏳ Your account and documents are currently pending verification by an Administrator. You cannot submit bids until approved.
+            </div>
+        {% endif %}
+
+        <div class="gig-grid">
+            <div class="gig-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="gig-title">Broken Ceiling Fan</h3>
+                        <div class="distance">📍 1.2 km away • Just now</div>
+                    </div>
+                    <span class="category-badge">Electrician</span>
+                </div>
+                <div class="ai-brief">
+                    <strong>AI Technical Brief:</strong>
+                    Fan makes a humming noise but blades won't spin. Likely a burnt capacitor or jammed bearing. Urgency: Medium.
+                </div>
+                <div class="bidding-info">🛑 3 Workers have already bid</div>
+                <button class="glow-button">Submit Blind Bid</button>
+            </div>
+
+            <div class="gig-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="gig-title">Sparking Wall Outlet</h3>
+                        <div class="distance">📍 3.5 km away • 15 mins ago</div>
+                    </div>
+                    <span class="category-badge">Electrician</span>
+                </div>
+                <div class="ai-brief">
+                    <strong>AI Technical Brief:</strong>
+                    Kitchen outlet sparked and tripped the main breaker when a microwave was plugged in. Short circuit likely. Urgency: High.
+                </div>
+                <div class="bidding-info">🛑 1 Worker has already bid</div>
+                <button class="glow-button">Submit Blind Bid</button>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
