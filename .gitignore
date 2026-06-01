@@ -1,0 +1,15 @@
+# Environments
+env/
+venv/
+ENV/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
+
+# Uploaded images (optional, but good practice so repo isn't huge)
+static/uploads/*
+!static/uploads/.gitkeep
