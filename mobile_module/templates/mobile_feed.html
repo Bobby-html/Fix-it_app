@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Worker Mobile Feed</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #0f172a; font-family: sans-serif; margin: 0; }
+        .mobile-frame { width: 350px; height: 700px; background-color: #121212; border-radius: 40px; border: 10px solid #334155; position: relative; overflow: hidden; display: flex; flex-direction: column; background-image: linear-gradient(to bottom, #1e293b, #0f172a); }
+        .status-bar { padding: 15px 20px; display: flex; justify-content: space-between; color: white; font-size: 12px; font-weight: bold; }
+        .header { padding: 20px; color: white; font-size: 24px; font-weight: bold; }
+        .gig-card { background: #1e293b; margin: 15px; border-radius: 20px; padding: 20px; border: 1px solid #334155; }
+        .title { color: white; font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .category { color: #00e5ff; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .desc { color: #cbd5e0; font-size: 14px; margin: 15px 0; line-height: 1.4; }
+        .bid-input { width: 100%; padding: 10px; margin-bottom: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 12px; background: #00e5ff; color: black; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+        .flash { background: #10b981; color: white; text-align: center; padding: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        <div class="status-bar">
+            <span>{{ user_name }}</span>
+            <span>Worker Mode</span>
+        </div>
+        
+        <div class="header">Nearby Gigs</div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <div style="overflow-y: auto; flex: 1;">
+            {% for gig in gigs %}
+            <div class="gig-card">
+                <div style="display: flex; justify-content: space-between;">
+                    <div class="title">{{ gig[2] }}</div> <div class="category">{{ gig[4] }}</div> </div>
+                <div style="color: #94a3b8; font-size: 12px;">📍 {{ gig[5] }}</div>
+                <div class="desc">{{ gig[3] }}</div> <form action="/submit_bid" method="POST" style="margin-top: 15px; border-top: 1px solid #334155; padding-top: 15px;">
+                    <input type="hidden" name="gig_id" value="{{ gig[0] }}">
+                    <input type="number" name="price" class="bid-input" placeholder="Your Bid (Rs.)" required>
+                    <input type="number" name="time" class="bid-input" placeholder="Estimated Time (Mins)" required>
+                    <button type="submit" class="submit-btn">Submit Blind Bid</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>

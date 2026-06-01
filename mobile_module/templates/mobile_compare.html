@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Bid Review</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #0f172a; font-family: sans-serif; margin: 0; }
+        .mobile-frame { width: 350px; height: 700px; background-color: #121212; border-radius: 40px; border: 10px solid #334155; position: relative; overflow: hidden; display: flex; flex-direction: column; background-image: linear-gradient(to bottom, #1e293b, #0f172a); }
+        .status-bar { padding: 15px 20px; display: flex; justify-content: space-between; color: white; font-size: 12px; font-weight: bold; }
+        .header { padding: 20px; color: white; font-size: 20px; font-weight: bold; border-bottom: 1px solid #334155; }
+        .bid-card { background: #0f172a; margin: 15px; border-radius: 15px; padding: 15px; border: 1px solid #00e5ff; }
+        .worker-name { color: white; font-size: 16px; font-weight: bold; }
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .price { color: #10b981; font-size: 20px; font-weight: bold; }
+        .accept-btn { background: #10b981; color: white; padding: 8px 15px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        <div class="status-bar">
+            <span>{{ user_name }}</span>
+            <span>Customer Mode</span>
+        </div>
+        
+        <div class="header">Review Active Bids</div>
+
+        <div style="overflow-y: auto; flex: 1;">
+            {% for bid in bids %}
+            <div class="bid-card">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 30px;">👨🏽‍🔧</div>
+                    <div>
+                        <div class="worker-name">{{ bid[2] }} <span style="color: #10b981; font-size:12px;">✔ Verified</span></div>
+                        <div style="color: #94a3b8; font-size: 12px;">ETA: {{ bid[4] }} Mins</div>
+                    </div>
+                </div>
+                <div class="price-row">
+                    <div class="price">Rs. {{ bid[3] }}</div>
+                    <button class="accept-btn" onclick="alert('Bid Accepted! Chat unlocked.')">Accept Offer</button>
+                </div>
+            </div>
+            {% else %}
+            <div style="color: #94a3b8; text-align: center; padding: 40px;">Waiting for workers to bid...</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
